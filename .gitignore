@@ -1,0 +1,73 @@
+# ----------------------------
+# Python / Django
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Env files
+.env
+.env.*
+*.env
+
+# Logs
+*.log
+logs/
+celerybeat.log
+
+# ----------------------------
+# Django specific
+# ----------------------------
+# Database (SQLite)
+db.sqlite3
+*.sqlite3
+
+# Media & collected static
+media/
+staticfiles/
+
+# Local settings
+local_settings.py
+settings_local.py
+
+# ----------------------------
+# Migrations (ignore all, keep __init__.py)
+# ----------------------------
+**/migrations/**
+!**/migrations/__init__.py
+
+# ----------------------------
+# Celery Beat schedule files
+# ----------------------------
+celerybeat-schedule
+celerybeat-schedule-wal
+celerybeat-schedule-shm
+
+
+
+
+# ----------------------------
+# OS / cache
+# ----------------------------
+*.tmp
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/

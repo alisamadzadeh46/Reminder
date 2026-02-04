@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}خروج{% endblock %}
+{% block page_title %}خروج از حساب{% endblock %}
+{% block page_subtitle %}آیا مطمئن هستید؟{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p class="mb-3">اگر خارج شوید، برای استفاده دوباره باید وارد شوید.</p>
+
+        <form method="post" action="{% url 'logout' %}" class="d-flex gap-2">
+          {% csrf_token %}
+          <button class="btn btn-danger w-50">خروج</button>
+          <a class="btn btn-outline-secondary w-50" href="{% url 'dashboard' %}">انصراف</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

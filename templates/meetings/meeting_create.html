@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}ایجاد جلسه{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h5>ایجاد جلسه</h5>
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      <div class="col-md-6">
+        <label class="form-label">عنوان</label>
+        {{ form.title }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">مکان/لینک</label>
+        {{ form.location }}
+      </div>
+      <div class="col-12">
+        <label class="form-label">توضیحات</label>
+        {{ form.description }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">شروع</label>
+        {{ form.start_at }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">پایان</label>
+        {{ form.end_at }}
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">دبیر</label>
+        {{ form.secretary }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">پیگیری‌کننده</label>
+        {{ form.follow_up_owner }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">تأییدکننده</label>
+        {{ form.approver }}
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-primary">ثبت</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}جزئیات جلسه{% endblock %}
+{% block content %}
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <h4>{{ meeting.title }}</h4>
+    <div class="text-muted">
+      {{ meeting.start_at|date:"Y-m-d H:i" }} تا {{ meeting.end_at|date:"H:i" }} | {{ meeting.location }}
+    </div>
+    <p class="mt-3">{{ meeting.description|linebreaks }}</p>
+
+    {% if my_invitation %}
+      <hr>
+      <form method="post" action="{% url 'meeting-rsvp' meeting.id %}" class="d-flex gap-2 align-items-center">
+        {% csrf_token %}
+        {{ rsvp_form.rsvp_status }}
+        <button class="btn btn-primary btn-sm">ثبت RSVP</button>
+        <span class="text-muted">وضعیت فعلی: {{ my_invitation.get_rsvp_status_display }}</span>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5>دستور جلسه</h5>
+        {% if agenda_items %}
+          <ol>
+            {% for a in agenda_items %}
+              <li><b>{{ a.title }}</b><div class="text-muted">{{ a.description }}</div></li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <div class="text-muted">موردی ثبت نشده.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5>شرکت‌کنندگان</h5>
+        {% if invitations %}
+          <ul class="list-group">
+            {% for inv in invitations %}
+              <li class="list-group-item d-flex justify-content-between">
+                <span>{{ inv.invitee.get_full_name|default:inv.invitee.username }}</span>
+                <span class="badge bg-secondary">{{ inv.get_rsvp_status_display }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">شرکت‌کننده‌ای ثبت نشده.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5>پیوست‌ها</h5>
+
+        <form method="post" enctype="multipart/form-data"
+              action="{% url 'meeting-attachment-upload' meeting.id %}"
+              class="row g-2 align-items-end mb-3">
+          {% csrf_token %}
+          <div class="col-md-4">
+            <label class="form-label">عنوان</label>
+            {{ attachment_form.title }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">فایل</label>
+            <input type="file" name="file" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100">آپلود</button>
+          </div>
+        </form>
+
+        {% if attachments %}
+          <ul>
+            {% for f in attachments %}
+              <li><a href="{{ f.file.url }}" target="_blank">{{ f.title|default:f.file.name }}</a></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">فایلی پیوست نشده.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}داشبورد{% endblock %}
+{% block page_title %}داشبورد{% endblock %}
+{% block page_subtitle %}نمای کلی جلسات، وظایف و اعلان‌ها{% endblock %}
+
+{% block extra_head %}
+<style>
+  .kpi-card { border: 1px solid rgba(0,0,0,.08); }
+  [data-bs-theme="dark"] .kpi-card { border-color: rgba(255,255,255,.12); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">اعلان‌های خوانده‌نشده</div>
+          <div class="value">{{ kpi.unread_notifs }}</div>
+        </div>
+        <i class="bi bi-bell fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">وظایف باز</div>
+          <div class="value">{{ kpi.open_tasks }}</div>
+        </div>
+        <i class="bi bi-list-check fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">سررسید 48 ساعت</div>
+          <div class="value">{{ kpi.due_48h }}</div>
+        </div>
+        <i class="bi bi-alarm fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">جلسات امروز</div>
+          <div class="value">{{ kpi.today_meetings }}</div>
+        </div>
+        <i class="bi bi-calendar2-week fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">جلسات ۷ روز آینده</h5>
+          <span class="muted small">بر اساس تاریخ شروع</span>
+        </div>
+
+        <!-- مهم: برای اینکه chart دیده بشه ارتفاع بده -->
+        <div style="height: 260px;">
+          <canvas id="meetingsChart"></canvas>
+        </div>
+
+        <div id="chartFallback" class="text-muted small mt-2" style="display:none;">
+          داده‌ای برای نمایش نمودار وجود ندارد.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5>جلسات امروز</h5>
+        {% if meetings_today %}
+          <ul class="list-group">
+            {% for m in meetings_today %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="{% url 'meeting-detail' m.id %}" class="text-decoration-none">{{ m.title }}</a>
+                <span class="badge text-bg-secondary">{{ m.start_at|date:"H:i" }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">جلسه‌ای برای امروز ندارید.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const labels = {{ chart_labels|safe }};
+  const data = {{ chart_data|safe }};
+
+  const canvas = document.getElementById("meetingsChart");
+  const fallback = document.getElementById("chartFallback");
+
+  if (!canvas || typeof Chart === "undefined") {
+    if (fallback) fallback.style.display = "block";
+    return;
+  }
+
+  // اگر همه مقادیر صفر بود، نمودار خیلی کم‌رنگ میشه؛ پیام جایگزین نمایش بده
+  const sum = (data || []).reduce((a,b)=>a+b,0);
+  if (!labels || labels.length === 0 || sum === 0) {
+    if (fallback) fallback.style.display = "block";
+    return;
+  }
+
+  new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "تعداد جلسات",
+        data: data,
+        tension: 0.35,
+        fill: true
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+});
+</script>
+{% endblock %}

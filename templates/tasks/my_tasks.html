@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% load utils %}
+
+{% block title %}وظایف من{% endblock %}
+{% block page_title %}وظایف من{% endblock %}
+{% block page_subtitle %}جستجو، فیلتر، تغییر وضعیت و آپلود پیوست{% endblock %}
+
+{% block extra_head %}
+<style>
+  .kpi-card { border: 1px solid rgba(0,0,0,.08); }
+  [data-bs-theme="dark"] .kpi-card { border-color: rgba(255,255,255,.12); }
+
+  .table td, .table th { white-space: nowrap; }
+  .desc { max-width: 520px; white-space: normal; }
+  .pill { font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- KPI -->
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">کل</div>
+          <div class="value">{{ kpi.total }}</div>
+        </div>
+        <i class="bi bi-collection fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">باز</div>
+          <div class="value">{{ kpi.open }}</div>
+        </div>
+        <i class="bi bi-list-check fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">سررسید 48 ساعت</div>
+          <div class="value">{{ kpi.due_48h }}</div>
+        </div>
+        <i class="bi bi-alarm fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body kpi">
+        <div>
+          <div class="muted">عقب‌افتاده</div>
+          <div class="value">{{ kpi.overdue }}</div>
+        </div>
+        <i class="bi bi-exclamation-triangle fs-2 muted"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-6">
+        <label class="form-label">جستجو</label>
+        {{ filter_form.q }}
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">وضعیت</label>
+        {{ filter_form.status }}
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">سررسید</label>
+        {{ filter_form.due }}
+      </div>
+
+      <div class="col-12 d-flex gap-2 mt-2">
+        <button class="btn btn-primary">
+          <i class="bi bi-funnel ms-1"></i> اعمال
+        </button>
+        <a class="btn btn-outline-secondary" href="{% url 'my-tasks' %}">پاک کردن</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">لیست وظایف</h5>
+      <div class="muted small">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</div>
+    </div>
+
+    {% if page_obj.object_list %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>عنوان</th>
+              <th>جلسه</th>
+              <th>وضعیت</th>
+              <th>سررسید</th>
+              <th class="text-center">تغییر وضعیت</th>
+              <th>پیوست</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for t in page_obj.object_list %}
+              {% with allowed=allowed_map|get_item:t.id %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  {% if t.description %}
+                    <div class="muted small desc">{{ t.description|truncatechars:160 }}</div>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if t.meeting_id %}
+                    <a class="text-decoration-none" href="{% url 'meeting-detail' t.meeting_id %}">
+                      {{ t.meeting.title|truncatechars:36 }}
+                    </a>
+                  {% else %}
+                    <span class="muted">-</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if t.status == "OPEN" %}
+                    <span class="badge text-bg-secondary pill">Open</span>
+                  {% elif t.status == "INPROGRESS" %}
+                    <span class="badge text-bg-primary pill">In Progress</span>
+                  {% elif t.status == "DONE" %}
+                    <span class="badge text-bg-success pill">Done</span>
+                  {% elif t.status == "VERIFIED" %}
+                    <span class="badge text-bg-info pill">Verified</span>
+                  {% elif t.status == "APPROVED" %}
+                    <span class="badge text-bg-success pill">Approved</span>
+                  {% elif t.status == "REJECTED" %}
+                    <span class="badge text-bg-danger pill">Rejected</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary pill">{{ t.get_status_display }}</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if t.due_date %}
+                    {% if t.due_date < now and t.status not in "DONE VERIFIED APPROVED REJECTED" %}
+                      <span class="badge text-bg-danger">Overdue</span>
+                      <div class="muted small">{{ t.due_date|date:"Y-m-d H:i" }}</div>
+                    {% else %}
+                      <span class="badge text-bg-light text-dark">Due</span>
+                      <div class="muted small">{{ t.due_date|date:"Y-m-d H:i" }}</div>
+                    {% endif %}
+                  {% else %}
+                    <span class="muted">-</span>
+                  {% endif %}
+                </td>
+
+                <td class="text-center">
+                  {% if allowed and allowed|length > 0 %}
+                    <form method="post" action="{% url 'task-change-status' t.id %}" class="d-flex gap-2 justify-content-center">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                      <select name="status" class="form-select form-select-sm" style="max-width: 170px;">
+                        {% for value,label in t.STATUS_CHOICES %}
+                          {% if value in allowed %}
+                            <option value="{{ value }}" {% if value == t.status %}selected{% endif %}>{{ label }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                      <button class="btn btn-sm btn-outline-primary">ثبت</button>
+                    </form>
+                  {% else %}
+                    <span class="muted small">اجازه تغییر ندارید</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if t.id %}
+                    <form method="post" enctype="multipart/form-data"
+                          action="{% url 'task-attachment-upload' t.id %}"
+                          class="d-flex gap-2">
+                      {% csrf_token %}
+                      <input type="file" name="file" class="form-control form-control-sm" required>
+                      <input type="text" name="title" class="form-control form-control-sm" placeholder="عنوان (اختیاری)">
+                      <button class="btn btn-sm btn-outline-secondary">آپلود</button>
+                    </form>
+                  {% else %}
+                    <span class="muted small">بدون ID</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&due={{ request.GET.due|default:'' }}&page={{ page_obj.previous_page_number }}">قبلی</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">قبلی</span></li>
+          {% endif %}
+
+          <li class="page-item disabled"><span class="page-link">{{ page_obj.number }}</span></li>
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&due={{ request.GET.due|default:'' }}&page={{ page_obj.next_page_number }}">بعدی</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">بعدی</span></li>
+          {% endif %}
+
+        </ul>
+      </nav>
+
+    {% else %}
+      <div class="text-muted">هیچ وظیفه‌ای یافت نشد.</div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

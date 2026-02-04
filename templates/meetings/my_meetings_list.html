@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}جلسات من{% endblock %}
+{% block page_title %}جلسات من{% endblock %}
+{% block page_subtitle %}لیست جلسات مرتبط با شما{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">لیست جلسات</h5>
+      <a class="btn btn-primary" href="{% url 'meeting-create' %}">
+        <i class="bi bi-plus-circle ms-1"></i> ایجاد جلسه
+      </a>
+    </div>
+
+    {% if meetings %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>عنوان</th>
+              <th>زمان</th>
+              <th>وضعیت</th>
+              <th class="text-end">عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in meetings %}
+              <tr>
+                <td class="fw-semibold">{{ m.title }}</td>
+                <td class="muted">{{ m.start_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                  <span class="badge text-bg-secondary">{{ m.get_status_display }}</span>
+                </td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'meeting-detail' m.id %}">
+                    مشاهده
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">جلسه‌ای یافت نشد.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}ایجاد وظیفه{% endblock %}
+{% block page_title %}ایجاد وظیفه{% endblock %}
+{% block page_subtitle %}ثبت وظیفه جدید{% endblock %}
+
+{% block extra_head %}
+<style>
+  .field-error { font-size: .875rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-10">
+    <div class="card shadow-sm">
+      <div class="card-body">
+
+        {# خطاهای کلی فرم (non-field errors) #}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for err in form.non_field_errors %}
+                <li>{{ err }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="post" class="row g-3" novalidate>
+          {% csrf_token %}
+
+          <div class="col-md-6">
+            <label class="form-label">جلسه (اختیاری)</label>
+            {{ form.meeting }}
+            {% if form.meeting.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.meeting.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">عنوان</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.title.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">توضیحات</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.description.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">مسئول</label>
+            {{ form.assignee }}
+            {% if form.assignee.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.assignee.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">پیگیری‌کننده</label>
+            {{ form.follower }}
+            {% if form.follower.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.follower.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">تأییدکننده</label>
+            {{ form.approver }}
+            {% if form.approver.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.approver.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">سررسید</label>
+            {{ form.due_date }}
+            {% if form.due_date.errors %}
+              <div class="text-danger field-error mt-1">
+                {% for err in form.due_date.errors %}{{ err }}<br>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-12 d-flex gap-2 mt-2">
+            <button class="btn btn-primary">
+              <i class="bi bi-check2-circle ms-1"></i> ثبت
+            </button>
+            <a class="btn btn-outline-secondary" href="{% url 'my-tasks' %}">
+              بازگشت
+            </a>
+          </div>
+
+          {# اگر بخوای همه خطاها یکجا پایین هم نمایش داده بشه #}
+          {% if form.errors %}
+            <div class="col-12 mt-3">
+              <div class="alert alert-danger">
+                <div class="fw-semibold mb-2">خطاهای فرم:</div>
+                <ul class="mb-0">
+                  {% for field in form %}
+                    {% for err in field.errors %}
+                      <li><b>{{ field.label }}:</b> {{ err }}</li>
+                    {% endfor %}
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

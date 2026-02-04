@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}اعلان‌ها{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h5>اعلان‌های من</h5>
+
+    {% if notifications %}
+      <ul class="list-group">
+        {% for n in notifications %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <div class="{% if not n.is_read %}fw-bold{% endif %}">{{ n.title }}</div>
+              <div class="text-muted small">{{ n.created_at|date:"Y-m-d H:i" }}</div>
+              <div>{{ n.message }}</div>
+            </div>
+            <div>
+              {% if not n.is_read %}
+                <a class="btn btn-outline-success btn-sm" href="{% url 'notification-read' n.id %}">خوانده شد</a>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="text-muted">اعلانی ندارید.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
