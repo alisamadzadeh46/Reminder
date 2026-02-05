@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "tasks",
     "files",
     "notifications",
+    "sms.apps.SmsConfig",
 ]
 
 MIDDLEWARE = [
@@ -78,9 +79,20 @@ WSGI_APPLICATION = 'Reminder.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': 'Reminder',
+
+        'USER': 'postgres',
+
+        'PASSWORD': 'post',
+
+        'HOST': 'localhost',
+
+        'PORT': '5432',
+
+}
 }
 
 # Password validation
@@ -127,11 +139,8 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
 CELERY_TIMEZONE = "Asia/Tehran"
 CELERY_ENABLE_UTC = False
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "login"
-

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}پنل پیامک{% endblock %}
+{% block page_title %}پنل پیامک{% endblock %}
+{% block page_subtitle %}لیست پیامک‌های ارسالی/در صف/ناموفق{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-8">
+        <label class="form-label">جستجو</label>
+        {{ filter_form.q }}
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">وضعیت</label>
+        {{ filter_form.status }}
+      </div>
+      <div class="col-12 d-flex gap-2 mt-2">
+        <button class="btn btn-primary">
+          <i class="bi bi-funnel ms-1"></i> اعمال
+        </button>
+        <a class="btn btn-outline-secondary" href="{% url 'sms-outbox' %}">پاک کردن</a>
+        <a class="btn btn-outline-primary ms-auto" href="{% url 'sms-send' %}">
+          <i class="bi bi-send ms-1"></i> ارسال پیامک
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Outbox</h5>
+      <div class="muted small">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</div>
+    </div>
+
+    {% if page_obj.object_list %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>شماره</th>
+              <th>وضعیت</th>
+              <th class="d-none d-md-table-cell">قالب</th>
+              <th>زمان</th>
+              <th class="text-end">جزئیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in page_obj.object_list %}
+              <tr>
+                <td class="fw-semibold">{{ s.to }}</td>
+                <td>
+                  {% if s.status == "SENT" %}
+                    <span class="badge text-bg-success">Sent</span>
+                  {% elif s.status == "FAILED" %}
+                    <span class="badge text-bg-danger">Failed</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">Queued</span>
+                  {% endif %}
+                </td>
+                <td class="d-none d-md-table-cell">
+                  {{ s.template.title|default:"-" }}
+                </td>
+                <td class="muted">
+                  {{ s.created_at|date:"Y-m-d H:i" }}
+                </td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'sms-detail' s.id %}">
+                    مشاهده
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&page={{ page_obj.previous_page_number }}">قبلی</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">قبلی</span></li>
+          {% endif %}
+
+          <li class="page-item disabled"><span class="page-link">{{ page_obj.number }}</span></li>
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&page={{ page_obj.next_page_number }}">بعدی</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">بعدی</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% else %}
+      <div class="text-muted">هیچ پیامکی یافت نشد.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

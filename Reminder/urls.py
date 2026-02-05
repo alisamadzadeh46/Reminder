@@ -28,6 +28,7 @@ urlpatterns = [
     path("tasks/", include("tasks.urls")),
     path("", include("accounts.urls")),
     path("notifications/", include("notifications.urls")),
+    path("sms/", include("sms.urls")),
 
 ]
 

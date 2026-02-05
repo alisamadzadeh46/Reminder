@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}ارسال پیامک{% endblock %}
+{% block page_title %}ارسال پیامک{% endblock %}
+{% block page_subtitle %}ارسال دستی پیامک (تکی){% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="post" class="row g-3" novalidate>
+          {% csrf_token %}
+
+          <div class="col-md-6">
+            <label class="form-label">شماره موبایل</label>
+            {{ form.to }}
+            {% for e in form.to.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">قالب (اختیاری)</label>
+            {{ form.template_key }}
+            {% for e in form.template_key.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">متن پیام</label>
+            {{ form.message }}
+            {% for e in form.message.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+            <div class="form-text">اگر قالب را انتخاب کردید، می‌توانید متن را خالی بگذارید.</div>
+          </div>
+
+          <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary">
+              <i class="bi bi-send ms-1"></i> ارسال
+            </button>
+            <a class="btn btn-outline-secondary" href="{% url 'sms-outbox' %}">بازگشت</a>
+          </div>
+
+          {% if form.errors %}
+            <div class="col-12 mt-2">
+              <div class="alert alert-danger">
+                لطفاً خطاهای فرم را اصلاح کنید.
+              </div>
+            </div>
+          {% endif %}
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -69,6 +69,10 @@
                    href="{% url 'my-notifications' %}">
                     <i class="bi bi-bell ms-2"></i> اعلان‌ها
                 </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'sms-outbox' %}active{% endif %}"
+                   href="{% url 'sms-outbox' %}">
+                    <i class="bi bi-chat-dots ms-2"></i> پنل پیامک
+                </a>
                 <a class="nav-link" href="{% url 'logout-confirm' %}">
                     <i class="bi bi-box-arrow-right ms-2"></i> خروج
                 </a>
