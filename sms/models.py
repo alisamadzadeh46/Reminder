@@ -4,9 +4,11 @@ from django.utils import timezone
 
 
 class SMSStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
     QUEUED = "QUEUED", "Queued"
     SENT = "SENT", "Sent"
     FAILED = "FAILED", "Failed"
+
 
 
 class SMSTemplateKey(models.TextChoices):
@@ -84,7 +86,7 @@ class OutboundSMS(models.Model):
 
     scheduled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
-
+    started_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
