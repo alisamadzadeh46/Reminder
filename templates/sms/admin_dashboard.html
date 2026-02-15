@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid px-4 mt-4" dir="rtl">
+
+        <h4 class="mb-4 fw-semibold">داشبورد پیامک‌های من</h4>
+
+        <!-- کارت‌ها -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <small class="text-muted">کل پیامک‌ها</small>
+                        <div class="fs-4">{{ total }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <small class="text-muted">ارسال موفق</small>
+                        <div class="fs-4 text-success">{{ sent }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <small class="text-muted">ارسال ناموفق</small>
+                        <div class="fs-4 text-danger">{{ failed }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <small class="text-muted">درصد موفقیت</small>
+                        <div class="fs-4">{{ success_rate }}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- چارت -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3">روند ارسال (۷ روز اخیر)</h6>
+                <div style="height:230px">
+                    <canvas id="smsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- جدول -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3">پیامک‌ها</h6>
+
+                <table class="table table-sm align-middle">
+                    <thead>
+                    <tr>
+                        <th>گیرنده</th>
+                        <th>وضعیت</th>
+                        <th>تاریخ</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for sms in page_obj %}
+                        <tr>
+                            <td>{{ sms.to }}</td>
+                            <td>
+                                {% if sms.status == "SENT" %}
+                                    <span class="badge bg-success">موفق</span>
+                                {% elif sms.status == "FAILED" %}
+                                    <span class="badge bg-danger">ناموفق</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">در صف</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ sms.created_at|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">پیامی وجود ندارد</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item disabled">
+          <span class="page-link">
+            صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}
+          </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        new Chart(document.getElementById("smsChart"), {
+            type: "line",
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    data: {{ chart_data|safe }},
+                    borderColor: "#333",
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {legend: {display: false}}
+            }
+        });
+    </script>
+{% endblock %}

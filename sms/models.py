@@ -5,10 +5,11 @@ from django.utils import timezone
 
 class SMSStatus(models.TextChoices):
     PENDING = "PENDING", "Pending"
-    QUEUED = "QUEUED", "Queued"
+    SENDING = "SENDING", "Sending"
     SENT = "SENT", "Sent"
+    DELIVERED = "DELIVERED", "Delivered"
     FAILED = "FAILED", "Failed"
-
+    QUEUED = "QUEUED", "Queued"
 
 
 class SMSTemplateKey(models.TextChoices):
@@ -113,3 +114,8 @@ class OutboundSMS(models.Model):
         self.error = error or "Unknown error"
         self.provider_response = provider_response or ""
         self.save(update_fields=["status", "error", "provider_response"])
+
+    def mark_delivered(self, provider_response=""):
+        self.status = SMSStatus.DELIVERED
+        self.provider_response = provider_response
+        self.save(update_fields=["status", "provider_response"])
