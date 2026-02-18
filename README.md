@@ -175,3 +175,41 @@ Feel free to contribute or suggest improvements.
 ⭐ If you like this project
 
 Don’t forget to star ⭐ the repository
+
+
+
+## 📸 Screenshots
+
+> Screenshots are located in the `screenshots/` folder.
+
+### Home Page (Admin and user)
+![Home Guest](screenshots/dashboard.png)
+
+### Dashboard My Sms 
+![Home Logged In](screenshots/dashboard-my-sms.png)
+
+### Dashboard Admin Sms
+![Dashboard](screenshots/dashboard-admin-sms.png)
+
+### Send sms
+![Dashboard](screenshots/send-sms.png)
+
+### Panel sms
+![Dashboard](screenshots/panel-sms.png)
+
+### Create Sessions
+![Dashboard](screenshots/create-sessions.png)
+
+
+### My Sessions
+![Dashboard](screenshots/my-session.png)
+
+
+### Create Tasks
+![Dashboard](screenshots/create-tasks.png)
+
+
+### My Tasks
+![Dashboard](screenshots/my-tasks.png)
+
+---
